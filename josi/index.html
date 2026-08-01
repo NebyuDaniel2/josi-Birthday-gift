@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 23rd Birthday Josi!</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for compiling JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden; 
+        }
+        
+        /* SUPER IGNITED Candle Flame Animation */
+        .flame {
+            animation: flicker 0.4s infinite alternate;
+            border-radius: 50% 50% 20% 20%;
+            /* Huge glow effect */
+            box-shadow: 0 0 30px #fbbf24, 0 0 60px #f97316, 0 0 90px #ea580c, 0 0 120px #ef4444;
+            transition: opacity 0.3s ease;
+        }
+        
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(0.9); opacity: 0.9; }
+            100% { transform: translateX(-50%) scale(1.15); opacity: 1; box-shadow: 0 0 40px #fcd34d, 0 0 80px #f97316, 0 0 120px #ea580c; }
+        }
+
+        /* Pulsing Glow behind candles */
+        .ignite-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(253, 224, 71, 0.4) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+
+        /* Hover effect for gallery photos */
+        .photo-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .photo-hover:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 15px 30px -5px rgba(249, 115, 22, 0.5);
+        }
+
+        /* Continuous Floating Balloon on Hero Image */
+        @keyframes floatContinuous {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-25px) rotate(8deg); }
+        }
+        .continuous-balloon {
+            animation: floatContinuous 2.5s ease-in-out infinite;
+        }
+
+        /* Explosive Click Pop Animation */
+        @keyframes popUp {
+            0% { transform: translate(-50%, -50%) scale(0.2) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -200px) scale(1.8) rotate(20deg); opacity: 0; }
+        }
+        .click-pop {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: popUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            font-weight: 900;
+            text-shadow: 2px 2px 10px rgba(255,255,255,1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Numbered Candle Component
+        const Candle = ({ number, isLit, onClick }) => (
+            <div 
+                className="relative flex flex-col items-center mx-4 mt-12 cursor-pointer hover:scale-110 transition-transform duration-300 z-10"
+                onClick={onClick}
+                title="Click to blow out the candle!"
+            >
+                {/* Flame */}
+                <div 
+                    className={`flame absolute -top-12 left-1/2 w-6 h-12 bg-gradient-to-b from-yellow-200 to-orange-500 ${isLit ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
+                
+                {/* Wick */}
+                <div className="w-1.5 h-4 bg-gray-800 mt-2 z-10 rounded-t-full"></div>
+                
+                {/* Candle Body */}
+                <div className={`w-20 h-32 rounded-md border-2 flex items-center justify-center shadow-2xl relative overflow-hidden transition-colors duration-700
+                    ${isLit ? 'bg-gradient-to-r from-white via-yellow-50 to-white border-yellow-200' : 'bg-gradient-to-r from-gray-500 via-gray-400 to-gray-500 border-gray-600'}`}>
+                    
+                    {/* Candle Stripes */}
+                    <div className="absolute inset-0 opacity-30 bg-[repeating-linear-gradient(45deg,transparent,transparent_15px,#f87171_15px,#f87171_30px)]"></div>
+                    
+                    <span className={`text-6xl font-black z-10 drop-shadow-lg transition-colors duration-700 ${isLit ? 'text-red-600' : 'text-gray-800'}`}>
+                        {number}
+                    </span>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [isLit, setIsLit] = useState(true);
+            const [pops, setPops] = useState([]);
+
+            // Explosive Click! Generate 3 items per click
+            const handleGlobalClick = (e) => {
+                const createPop = (offset, icon) => ({
+                    id: Date.now() + Math.random(),
+                    x: e.clientX + offset,
+                    y: e.clientY,
+                    content: icon
+                });
+
+                const newPops = [
+                    createPop(-30, '🎈'),
+                    createPop(0, '23!'),
+                    createPop(30, '✨')
+                ];
+                
+                setPops(prev => [...prev, ...newPops]);
+
+                setTimeout(() => {
+                    setPops(prev => prev.filter(p => !newPops.some(np => np.id === p.id)));
+                }, 1200);
+            };
+
+            const toggleLights = (e) => {
+                e.stopPropagation(); 
+                setIsLit(!isLit);
+            };
+
+            // BRIGHT THEME vs NEON PARTY THEME
+            const themeClasses = isLit 
+                ? "bg-gradient-to-br from-amber-50 via-yellow-100 to-orange-100 text-slate-900" 
+                : "bg-gradient-to-br from-indigo-950 via-purple-900 to-black text-gray-200";
+                
+            const headerClasses = isLit
+                ? "bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400 border-orange-500 shadow-orange-500/50"
+                : "bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900 border-purple-500 shadow-purple-500/50";
+
+            return (
+                <div 
+                    className={`min-h-screen pb-12 transition-all duration-1000 ${themeClasses}`} 
+                    onClick={handleGlobalClick}
+                >
+                    {pops.map(pop => (
+                        <div 
+                            key={pop.id} 
+                            className={`click-pop text-4xl md:text-5xl ${pop.content === '23!' ? (isLit ? 'text-orange-600' : 'text-yellow-400') : ''}`}
+                            style={{ left: pop.x, top: pop.y }}
+                        >
+                            {pop.content}
+                        </div>
+                    ))}
+
+                    {/* Header Section */}
+                    <header className={`relative text-center pt-16 pb-12 border-b-8 shadow-2xl transition-all duration-1000 overflow-hidden ${headerClasses}`}>
+                        
+                        {/* Background Ignite Glow */}
+                        {isLit && <div className="ignite-glow"></div>}
+
+                        <h1 className={`relative z-10 text-6xl md:text-8xl font-black drop-shadow-xl mb-2 tracking-tight transition-colors duration-1000 ${isLit ? 'text-white' : 'text-purple-300'}`}>
+                            HAPPY BIRTHDAY!
+                        </h1>
+                        <p className={`relative z-10 text-xl md:text-2xl tracking-widest uppercase font-bold mb-6 transition-colors duration-1000 ${isLit ? 'text-orange-100' : 'text-purple-400'}`}>
+                            Yosef Ashebere • aka Josi Adolise
+                        </p>
+                        
+                        {/* 23 Candles */}
+                        <div className="relative flex justify-center items-end">
+                            <Candle number="2" isLit={isLit} onClick={toggleLights} />
+                            <Candle number="3" isLit={isLit} onClick={toggleLights} />
+                        </div>
+                        <p className={`relative z-10 text-sm mt-6 font-bold animate-pulse transition-colors duration-1000 ${isLit ? 'text-orange-900' : 'text-purple-300'}`}>
+                            (Tap candles for Party Mode, tap the screen to explode!)
+                        </p>
+                    </header>
+
+                    <main className="max-w-6xl mx-auto px-4 mt-16">
+                        {/* Hero Section */}
+                        <section className={`flex flex-col md:flex-row items-center gap-10 rounded-3xl p-8 shadow-2xl mb-16 transition-all duration-1000 transform hover:-translate-y-1 ${isLit ? 'bg-white border-2 border-yellow-200' : 'bg-slate-900 border-2 border-purple-500 shadow-purple-900/50'}`}>
+                            
+                            {/* Photo with Floating Balloon */}
+                            <div className="flex-1 w-full relative">
+                                <img 
+                                    src="photo_3_2026-08-02_00-40-54.jpg" 
+                                    alt="Josi Birthday Boy" 
+                                    className={`w-full h-auto rounded-2xl border-8 shadow-2xl photo-hover object-cover transition-colors duration-1000 ${isLit ? 'border-orange-400' : 'border-purple-500'}`}
+                                />
+                                <div className="absolute -top-10 -right-8 text-8xl continuous-balloon z-20 drop-shadow-2xl pointer-events-none">
+                                    🎈
+                                </div>
+                                <div className="absolute -bottom-6 -left-6 text-6xl continuous-balloon z-20 drop-shadow-2xl pointer-events-none" style={{animationDelay: '1s'}}>
+                                    ✨
+                                </div>
+                            </div>
+
+                            <div className="flex-2 w-full md:w-2/3">
+                                <h2 className="text-4xl font-black mb-6">
+                                    System Update: <span className={isLit ? 'text-orange-600' : 'text-purple-400'}>Version 23.0 Deployed 🔥</span>
+                                </h2>
+                                <p className={`text-xl mb-4 font-medium leading-relaxed ${isLit ? 'text-gray-700' : 'text-gray-300'}`}>
+                                    To the most charming, caring, and religious guy we know. May St. Joseph continue to guide your path as you level up in life and in your career.
+                                </p>
+                                <p className={`text-xl mb-8 font-medium leading-relaxed ${isLit ? 'text-gray-700' : 'text-gray-300'}`}>
+                                    Congratulations on unlocking the <strong>"Godfather"</strong> achievement this year! Just a heads-up from one engineer to another: babies do not come with documentation, there are no GitHub repos to clone a quick fix for 3 AM crying, and you definitely can't just Ctrl+Z a dirty diaper. Good luck!
+                                </p>
+                                
+                                {/* Stats Grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    <div className={`p-6 rounded-xl text-center border-2 shadow-lg transition-colors duration-1000 ${isLit ? 'bg-orange-50 border-orange-200' : 'bg-black border-purple-700'}`}>
+                                        <h3 className={`font-black text-lg mb-2 ${isLit ? 'text-orange-600' : 'text-purple-400'}`}>Current Role</h3>
+                                        <p className="font-bold text-xl">5th-Year SWE</p>
+                                    </div>
+                                    <div className={`p-6 rounded-xl text-center border-2 shadow-lg transition-colors duration-1000 ${isLit ? 'bg-orange-50 border-orange-200' : 'bg-black border-purple-700'}`}>
+                                        <h3 className={`font-black text-lg mb-2 ${isLit ? 'text-orange-600' : 'text-purple-400'}`}>New Status</h3>
+                                        <p className="font-bold text-xl">Godfather 👶</p>
+                                    </div>
+                                    <div className={`p-6 rounded-xl text-center border-2 shadow-lg transition-colors duration-1000 ${isLit ? 'bg-orange-50 border-orange-200' : 'bg-black border-purple-700'}`}>
+                                        <h3 className={`font-black text-lg mb-2 ${isLit ? 'text-orange-600' : 'text-purple-400'}`}>Future Status</h3>
+                                        <p className={`font-black text-2xl ${isLit ? 'text-green-600' : 'text-green-400'}`}>Very Rich 💰</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Quote Section */}
+                        <section className={`text-center py-16 px-8 rounded-3xl mb-16 shadow-2xl transition-all duration-1000 transform hover:scale-105 ${isLit ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gradient-to-r from-indigo-700 to-purple-800'}`}>
+                            <p className="text-3xl italic text-white mb-6 font-serif font-bold drop-shadow-md">
+                                "A good godfather is like a reliable backend server—always there when you need support, handles the heavy lifting, and never drops your requests."
+                            </p>
+                            <p className="text-xl text-white font-medium opacity-90">
+                                Here's to a year free of Laravel environment dependency errors, full of successful deployments, and steps closer to building your tech empire!
+                            </p>
+                        </section>
+
+                        {/* Photo Gallery */}
+                        <h2 className={`text-5xl font-black text-center mb-10 drop-shadow-sm transition-colors duration-1000 ${isLit ? 'text-orange-600' : 'text-purple-400'}`}>
+                            Version History 📸
+                        </h2>
+                        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8">
+                            <img src="photo_1_2026-08-02_00-40-35.jpg" alt="Memory 1" className={`w-full h-96 object-cover rounded-2xl photo-hover shadow-xl cursor-pointer border-4 ${isLit ? 'border-white' : 'border-purple-500'}`} />
+                            <img src="photo_2_2026-08-02_00-40-54.jpg" alt="Memory 2" className={`w-full h-96 object-cover rounded-2xl photo-hover shadow-xl cursor-pointer border-4 ${isLit ? 'border-white' : 'border-purple-500'}`} />
+                            <img src="photo_4_2026-08-02_00-40-54.jpg" alt="Memory 3" className={`w-full h-96 object-cover rounded-2xl photo-hover shadow-xl cursor-pointer border-4 ${isLit ? 'border-white' : 'border-purple-500'}`} />
+                        </section>
+                    </main>
+
+                    <footer className={`text-center mt-8 pt-8 pb-12 border-t-2 font-bold transition-colors duration-1000 ${isLit ? 'border-orange-200 text-orange-800' : 'border-purple-800 text-purple-400'}`}>
+                        <p>Compiled with love, zero syntax errors, and maximum brightness for the future rich man.</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
